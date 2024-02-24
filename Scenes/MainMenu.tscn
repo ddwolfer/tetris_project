@@ -1,0 +1,103 @@
+[gd_scene load_steps=8 format=3 uid="uid://bmyy1c1lug81o"]
+
+[ext_resource type="Script" path="res://Script/Common/MainMenu.gd" id="1_7aqup"]
+[ext_resource type="Texture2D" uid="uid://cnfxvuscspv8k" path="res://Resource/img/MenuBackground.jpg" id="1_laq0d"]
+[ext_resource type="FontFile" uid="uid://cq6c1weuw2skh" path="res://Resource/ttf/Seto.ttf" id="2_iiiw2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jmrb4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_v8p3c"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tdfur"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8mlpi"]
+
+[node name="MainMenu" type="Node2D"]
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="UI_Root" type="Control" parent="CanvasLayer"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_7aqup")
+
+[node name="Bg" type="NinePatchRect" parent="CanvasLayer/UI_Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 1.0
+offset_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_laq0d")
+patch_margin_top = 130
+patch_margin_bottom = 117
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
+[node name="TextNode" type="VBoxContainer" parent="CanvasLayer/UI_Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="CanvasLayer/UI_Root/TextNode"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("2_iiiw2")
+theme_override_font_sizes/font_size = 60
+text = "Tetris Project
+
+"
+horizontal_alignment = 1
+
+[node name="Button" type="VBoxContainer" parent="CanvasLayer/UI_Root/TextNode"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="Start" type="Button" parent="CanvasLayer/UI_Root/TextNode/Button"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../Quit")
+focus_neighbor_bottom = NodePath("../Option")
+theme_override_fonts/font = ExtResource("2_iiiw2")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/hover = SubResource("StyleBoxFlat_jmrb4")
+theme_override_styles/focus = SubResource("StyleBoxFlat_v8p3c")
+text = "  Start  "
+
+[node name="Option" type="Button" parent="CanvasLayer/UI_Root/TextNode/Button"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+focus_neighbor_top = NodePath("../Start")
+focus_neighbor_bottom = NodePath("../Quit")
+theme_override_fonts/font = ExtResource("2_iiiw2")
+theme_override_font_sizes/font_size = 25
+text = "Option"
+
+[node name="Quit" type="Button" parent="CanvasLayer/UI_Root/TextNode/Button"]
+layout_mode = 2
+focus_neighbor_top = NodePath("../Option")
+focus_neighbor_bottom = NodePath("../Start")
+theme_override_fonts/font = ExtResource("2_iiiw2")
+theme_override_font_sizes/font_size = 25
+theme_override_styles/hover = SubResource("StyleBoxFlat_tdfur")
+theme_override_styles/focus = SubResource("StyleBoxFlat_8mlpi")
+text = "Quit"
+
+[connection signal="pressed" from="CanvasLayer/UI_Root/TextNode/Button/Start" to="CanvasLayer/UI_Root" method="_on_start_pressed"]
+[connection signal="pressed" from="CanvasLayer/UI_Root/TextNode/Button/Quit" to="CanvasLayer/UI_Root" method="_on_quit_pressed"]

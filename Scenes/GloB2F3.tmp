@@ -1,0 +1,13 @@
+[gd_scene load_steps=4 format=3 uid="uid://cr0xu7laqlxs2"]
+
+[ext_resource type="Script" path="res://Script/Common/Global.gd" id="1_fun27"]
+[ext_resource type="PackedScene" uid="uid://bmyy1c1lug81o" path="res://Scenes/MainMenu.tscn" id="2_0tupa"]
+[ext_resource type="PackedScene" uid="uid://linulaw52pi5" path="res://Scenes/Game/GameView.tscn" id="3_16hn3"]
+
+[node name="Global" type="Node"]
+script = ExtResource("1_fun27")
+SCENES = Array[PackedScene]([ExtResource("2_0tupa"), ExtResource("3_16hn3")])
+SCENES_MAP = {
+"MainGame": 1,
+"Menu": 0
+}

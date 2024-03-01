@@ -1,8 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://linulaw52pi5"]
+[gd_scene load_steps=3 format=3 uid="uid://linulaw52pi5"]
 
+[ext_resource type="Script" path="res://Script/GameView.gd" id="1_054i4"]
 [ext_resource type="PackedScene" uid="uid://dvlnht6pc17t3" path="res://Scenes/Game/Border.tscn" id="1_eonhn"]
 
 [node name="GameView" type="Node2D"]
+script = ExtResource("1_054i4")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -21,12 +23,12 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -20.0
+offset_left = -140.0
 offset_top = -40.0
-offset_right = 20.0
+offset_right = 160.0
 grow_horizontal = 2
 grow_vertical = 0
 
 [node name="Border" parent="CanvasLayer/Control/VBoxContainer" instance=ExtResource("1_eonhn")]
-position = Vector2(0, 31)
-scale = Vector2(3, 3)
+position = Vector2(0, 30)
+scale = Vector2(0.48, 0.48)

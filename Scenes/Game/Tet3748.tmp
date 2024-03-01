@@ -1,0 +1,13 @@
+[gd_scene load_steps=3 format=3 uid="uid://cek5ghao5vi5"]
+
+[ext_resource type="Script" path="res://Script/Tetromino.gd" id="1_4kqat"]
+[ext_resource type="Texture2D" uid="uid://c4qdeu57xlutf" path="res://icon.svg" id="2_66fjt"]
+
+[node name="Termino" type="Node2D"]
+script = ExtResource("1_4kqat")
+
+[node name="Node" type="Node" parent="."]
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(576, 383)
+texture = ExtResource("2_66fjt")

@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://qmu0lcrfuvct"]
+
+[ext_resource type="Texture2D" uid="uid://b2psbv4odnrch" path="res://Resource/img/Blue.png" id="1_sipdl"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_svvn2"]
+size = Vector2(64, 64)
+
+[node name="Block" type="Area2D"]
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(32, -32)
+texture = ExtResource("1_sipdl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(32, -32)
+shape = SubResource("RectangleShape2D_svvn2")
+debug_color = Color(0, 0.6, 0.701961, 0)

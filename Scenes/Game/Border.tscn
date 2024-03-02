@@ -6,7 +6,7 @@
 
 [node name="Border" type="Node2D"]
 script = ExtResource("1_8x3sp")
-m_fallSpeed = 0.2
+m_fallSpeed = 0.1
 
 [node name="Timer" type="Timer" parent="."]
 

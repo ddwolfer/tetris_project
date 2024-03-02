@@ -196,7 +196,13 @@ func checkCanFall()->bool:
 
 # 遊戲是否結束
 func checkIsEndGame()->bool:
-	
+	# 偵測最高那一排 index 3~7 有沒有方塊
+	var maxCheck = 7
+	var minCheck = 3
+	for idx in range(minCheck, maxCheck):
+		print(idx)
+		if m_playfield[BORDER_HEIGHT-1][idx]:
+			return true
 	return false
 
 # 拿來落下用的
@@ -206,10 +212,10 @@ func _on_timer_timeout():
 	if checkCanFall():
 		fallTetrominoThisTurn()
 	else:
-		checkIsEndGame()
 		m_timer.stop()
 		m_tetroThisTurn.clear()
-		getNextTetromino()
+		if not checkIsEndGame():
+			getNextTetromino()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta):

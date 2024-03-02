@@ -46,18 +46,18 @@ func CreateTetromino(tetrominoSetting:Dictionary)->Array:
 	var blockList = []
 	var blockPos = tetrominoSetting.cellsVector
 	var color = 0
-	for col in range(blockPos.size()):
-		for row in range(blockPos[col].size()):
-			if blockPos[col][row] == 1:
+	for row in range(blockPos.size()):
+		for col in range(blockPos[row].size()):
+			if blockPos[row][col] == 1:
 				var newBlock = load(BLOCK_PATH).instantiate()
 				newBlock.get_node("./Sprite2D").texture = load(tetrominoSetting["spr"])
 				color = color + 1
-				newBlock.position.x = row * TetrominoDefine.BLOCK_WIDTH + m_startPos.x
-				newBlock.position.y = col * TetrominoDefine.BLOCK_HEIGHT + m_startPos.y
+				newBlock.position.x = col * TetrominoDefine.BLOCK_WIDTH + m_startPos.x
+				newBlock.position.y = row * TetrominoDefine.BLOCK_HEIGHT + m_startPos.y
 				blockList.append(newBlock)
 				m_borderNode.add_child(newBlock)
 				print(newBlock)
-				if col == tetrominoSetting["achorPoint"][0] and row == tetrominoSetting["achorPoint"][1]:
+				if row == tetrominoSetting["achorPoint"][0] and col == tetrominoSetting["achorPoint"][1]:
 					m_anchorNode = newBlock
 
 	return blockList

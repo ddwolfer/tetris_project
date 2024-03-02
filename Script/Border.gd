@@ -23,9 +23,9 @@ func _ready():
 
 func init_variable():
 	# 初始化盤面
-	for col in range(BORDER_HEIGHT):
+	for row in range(BORDER_HEIGHT):
 		var colData = []
-		for row in range(BORDER_WIDTH):
+		for col in range(BORDER_WIDTH):
 			colData.append(false)
 		m_playfield.append(colData)
 	
@@ -45,104 +45,104 @@ func getNextTetromino():
 	m_timer.start()
 	# 放入對應位置的 playfield 方便取用
 	for block in m_tetroThisTurn:
-		var tetroPos = getTetroColRowWithNode(block)
-		m_playfield[tetroPos["col"]][tetroPos["row"]] = block
+		var tetroPos = getTetroRowColWithNode(block)
+		m_playfield[tetroPos["row"]][tetroPos["col"]] = block
 
 # 回傳 目前方塊在哪行哪列 (start with 0)
-func getTetroColRowWithNode(tetroNode:Node2D)->Dictionary:
-	var col:int = 0
+func getTetroRowColWithNode(tetroNode:Node2D)->Dictionary:
 	var row:int = 0
+	var col:int = 0
 	
-	col = int(float(tetroNode.position.y - (TetrominoDefine.BLOCK_HEIGHT / 2.0)) / float(TetrominoDefine.BLOCK_HEIGHT) ) * -1 - 1
-	row = int(float(tetroNode.position.x - (TetrominoDefine.BLOCK_WIDTH / 2.0)) / float(TetrominoDefine.BLOCK_WIDTH))
+	row = int(float(tetroNode.position.y - (TetrominoDefine.BLOCK_HEIGHT / 2.0)) / float(TetrominoDefine.BLOCK_HEIGHT) ) * -1 - 1
+	col = int(float(tetroNode.position.x - (TetrominoDefine.BLOCK_WIDTH / 2.0)) / float(TetrominoDefine.BLOCK_WIDTH))
 	
-	return {"col":col, "row":row}
+	return {"row":row, "col":col}
 
 # 落下本輪的方塊
 func fallTetrominoThisTurn():
-	for col in range(m_playfield.size()):
-		for row in range(m_playfield[col].size()):
-			var blockNode = m_playfield[col][row]
+	for row in range(m_playfield.size()):
+		for col in range(m_playfield[row].size()):
+			var blockNode = m_playfield[row][col]
 			if not blockNode:
 				continue
 			# 如果不是本輪的
 			if not blockNode in m_tetroThisTurn:
 				continue
 			# 如果無法下降 (事前應該會先判斷)
-			if m_playfield[col-1][row]:
+			if m_playfield[row-1][col]:
 				return
 			blockNode.position.y = blockNode.position.y + TetrominoDefine.BLOCK_HEIGHT
-			m_playfield[col-1][row] = blockNode
-			m_playfield[col][row] = false
+			m_playfield[row-1][col] = blockNode
+			m_playfield[row][col] = false
 # 往左跑
 func moveTetroLeft():
-	for row in range(m_playfield[0].size()):
-		for col in range(m_playfield.size()):
-			var blockNode = m_playfield[col][row]
+	for col in range(m_playfield[0].size()):
+		for row in range(m_playfield.size()):
+			var blockNode = m_playfield[row][col]
 			if not blockNode:
 				continue
 			# 如果不是本輪的
 			if not blockNode in m_tetroThisTurn:
 				continue
 			# 如果無法往左
-			if row <= 0:
+			if col <= 0:
 				return
-			if m_playfield[col][row - 1]:
+			if m_playfield[row][col - 1]:
 				return
 			blockNode.position.x = blockNode.position.x - TetrominoDefine.BLOCK_WIDTH
-			m_playfield[col][row - 1] = blockNode
-			m_playfield[col][row] = false
+			m_playfield[row][col - 1] = blockNode
+			m_playfield[row][col] = false
 # 往右跑
 func moveTetroRight():
 	for _row in range(m_playfield[0].size()):
-		for col in range(m_playfield.size()):
-			var row = m_playfield[0].size() - _row - 1
-			var blockNode = m_playfield[col][row]
+		for row in range(m_playfield.size()):
+			var col = m_playfield[0].size() - _row - 1
+			var blockNode = m_playfield[row][col]
 			if not blockNode:
 				continue
 			# 如果不是本輪的
 			if not blockNode in m_tetroThisTurn:
 				continue
 			# 如果無法往右
-			if row >= (m_playfield[0].size() - 1):
+			if col >= (m_playfield[0].size() - 1):
 				return
-			if m_playfield[col][row + 1]:
+			if m_playfield[row][col + 1]:
 				return
 			blockNode.position.x = blockNode.position.x + TetrominoDefine.BLOCK_WIDTH
-			m_playfield[col][row + 1] = blockNode
-			m_playfield[col][row] = false
+			m_playfield[row][col + 1] = blockNode
+			m_playfield[row][col] = false
 
 # 計算方塊轉向後要在哪邊
 func getBlockRotatePos(blockPos:Dictionary, anchorPos:Dictionary)->Dictionary:
-	var newCol = 0
 	var newRow = 0
-	var _col = blockPos["col"] - anchorPos["col"]
-	var _row = blockPos["row"] - anchorPos["row"]
+	var newCol = 0
+	var _col = blockPos["row"] - anchorPos["row"]
+	var _row = blockPos["col"] - anchorPos["col"]
 	# 不用計算象限的
 	if _col == 0 or _row == 0:
 		if _row != 0 and _col == 0 :
-			newCol = _row * -1
-			newRow = 0
-		elif _row == 0 and _col != 0:
+			newRow = _row * -1
 			newCol = 0
-			newRow = _col
-		return {"col": newCol + anchorPos["col"], "row": newRow + anchorPos["row"]}
+		elif _row == 0 and _col != 0:
+			newRow = 0
+			newCol = _col
+		return {"row": newRow + anchorPos["row"], "col": newCol + anchorPos["col"]}
 	
 	# 對應象限更改
 	if _row > 0 and _col > 0:  # 第一象限
-		newRow = _col
-		newCol = _row * -1
+		newCol = _col
+		newRow = _row * -1
 	elif _row > 0 and _col < 0:  # 第二象限
-		newRow = _col 
-		newCol = _row * -1
+		newCol = _col 
+		newRow = _row * -1
 	elif _row < 0 and _col < 0 :  # 第三象限
-		newRow = _col
-		newCol = _row * -1
+		newCol = _col
+		newRow = _row * -1
 	elif _row < 0 and _col > 0:  # 第四象限
-		newRow = _col 
-		newCol = _row * -1
+		newCol = _col 
+		newRow = _row * -1
 		
-	return {"col": newCol + anchorPos["col"], "row": newRow + anchorPos["row"]}
+	return {"row": newRow + anchorPos["row"], "col": newCol + anchorPos["col"]}
 
 # 轉向
 func rotateTetro():
@@ -154,42 +154,42 @@ func rotateTetro():
 	if not m_tetroDefineNow["rotate"]:
 		return
 	
-	var anchorNodePos = getTetroColRowWithNode(m_tetroDefineNow["anchorNode"])
+	var anchorNodePos = getTetroRowColWithNode(m_tetroDefineNow["anchorNode"])
 	var tempForPlaceNewBlock = []
 	# 記住新轉向後的位置 把現在位置的紀錄刪掉
 	for block in m_tetroThisTurn:
-		var blockPos = getTetroColRowWithNode(block)
+		var blockPos = getTetroRowColWithNode(block)
 		if block == m_tetroDefineNow["anchorNode"]:
 			tempForPlaceNewBlock.append({"nextPos" : blockPos, "block": block})
-			m_playfield[blockPos["col"]][blockPos["row"]] = false
+			m_playfield[blockPos["row"]][blockPos["col"]] = false
 			continue
 		var nextPos = getBlockRotatePos(blockPos, anchorNodePos)
 		tempForPlaceNewBlock.append({"nextPos" : nextPos, "block": block})
-		m_playfield[blockPos["col"]][blockPos["row"]] = false
+		m_playfield[blockPos["row"]][blockPos["col"]] = false
 		
-		if nextPos["col"] >= BORDER_HEIGHT - 1:
-			touchTop = min(BORDER_HEIGHT - 1 - nextPos["col"], touchTop) 
-		if nextPos["row"] > BORDER_WIDTH - 1:
+		if nextPos["row"] >= BORDER_HEIGHT - 1:
+			touchTop = min(BORDER_HEIGHT - 1 - nextPos["row"], touchTop) 
+		if nextPos["col"] > BORDER_WIDTH - 1:
 			touchRight = -1
-		elif nextPos["row"] < 0:
+		elif nextPos["col"] < 0:
 			touchLeft = 1
 	
 	# 寫入新位置方塊並重新Set position
 	for setting in tempForPlaceNewBlock:
 		var nextPos = setting["nextPos"]
-		m_playfield[nextPos["col"] + touchTop][nextPos["row"] + touchRight + touchLeft] = setting["block"]
-		setting["block"].position.x = (nextPos["row"] + touchRight + touchLeft + 0.5) * TetrominoDefine.BLOCK_WIDTH
-		setting["block"].position.y = (nextPos["col"] + touchTop + 0.5) * TetrominoDefine.BLOCK_HEIGHT * -1
+		m_playfield[nextPos["row"] + touchTop][nextPos["col"] + touchRight + touchLeft] = setting["block"]
+		setting["block"].position.x = (nextPos["col"] + touchRight + touchLeft + 0.5) * TetrominoDefine.BLOCK_WIDTH
+		setting["block"].position.y = (nextPos["row"] + touchTop + 0.5) * TetrominoDefine.BLOCK_HEIGHT * -1
 	
 
 func checkCanFall()->bool:
 	for block in m_tetroThisTurn:
-		var pos = getTetroColRowWithNode(block)
+		var pos = getTetroRowColWithNode(block)
 		# 下面就是底
-		if pos["col"] <= 0 :
+		if pos["row"] <= 0 :
 			return false
 		# 下面有其他方塊
-		if m_playfield[pos["col"] - 1][pos["row"]] and not (m_playfield[pos["col"] - 1][pos["row"]] in m_tetroThisTurn):
+		if m_playfield[pos["row"] - 1][pos["col"]] and not (m_playfield[pos["row"] - 1][pos["col"]] in m_tetroThisTurn):
 			return false
 				
 	return true
@@ -207,33 +207,33 @@ func checkIsEndGame()->bool:
 
 # 確定有沒有要刪除的
 func checkLineEliminate():
-	for col in range(m_playfield.size()):
+	for row in range(m_playfield.size()):
 		var haveEmpty = false
-		for block in m_playfield[col]:
+		for block in m_playfield[row]:
 			if not block:
 				haveEmpty = true
 		if not haveEmpty:
-			eliminateLine(col)
+			eliminateLine(row)
 			checkLineEliminate()
 			return
 
 # 刪除一列		
 func eliminateLine(line:int):
 	# 整列的方塊消失
-	for row in range(m_playfield[line].size()):
-		var block = m_playfield[line][row]
+	for col in range(m_playfield[line].size()):
+		var block = m_playfield[line][col]
 		self.remove_child(block)
-		m_playfield[line][row] = false
+		m_playfield[line][col] = false
 	
 	# 把上面的方塊通通下移
-	for col in range(line, BORDER_HEIGHT):
-		for row in range(BORDER_WIDTH):
-			if not m_playfield[col][row]:
+	for row in range(line, BORDER_HEIGHT):
+		for col in range(BORDER_WIDTH):
+			if not m_playfield[row][col]:
 				continue
-			var block = m_playfield[col][row]
+			var block = m_playfield[row][col]
 			block.position.y = block.position.y + TetrominoDefine.BLOCK_HEIGHT
-			m_playfield[col - 1][row] = m_playfield[col][row]
-			m_playfield[col][row] = false
+			m_playfield[row - 1][col] = m_playfield[row][col]
+			m_playfield[row][col] = false
 
 # 拿來落下用的
 func _on_timer_timeout():

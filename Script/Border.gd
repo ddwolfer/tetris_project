@@ -183,23 +183,14 @@ func rotateTetro():
 	
 
 func checkCanFall()->bool:
-	var findBottomBlock = false
-	for col in range(m_playfield.size()):
-		if findBottomBlock:
-			break
-		for row in range(m_playfield[col].size()):
-			var blockNode = m_playfield[col][row]
-			if not blockNode in m_tetroThisTurn:
-				continue
-			# 找到該輪最下面一塊方塊了
-			findBottomBlock = true
-			var tetroPos = getTetroColRowWithNode(blockNode)
-			# 是否到最底部(col)
-			if tetroPos["col"] <= 0 :
-				return false
-			# 下面是否有別的方塊
-			if m_playfield[tetroPos["col"] - 1][tetroPos["row"]]:
-				return false
+	for block in m_tetroThisTurn:
+		var pos = getTetroColRowWithNode(block)
+		# 下面就是底
+		if pos["col"] <= 0 :
+			return false
+		# 下面有其他方塊
+		if m_playfield[pos["col"] - 1][pos["row"]] and not (m_playfield[pos["col"] - 1][pos["row"]] in m_tetroThisTurn):
+			return false
 				
 	return true
 

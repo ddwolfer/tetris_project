@@ -8,6 +8,7 @@ var BORDER_WIDTH:int  = 10
 
 # variables
 @export var m_fallSpeed:float = 1
+var m_tetroDefineNow = null
 var m_playfield = []
 var m_tetroThisTurn = []
 var m_tetrominoFactor = preload("Tetromino.gd").new()
@@ -37,7 +38,9 @@ func init_variable():
 
 # 拿下一輪方塊
 func getNextTetromino():
-	m_tetroThisTurn = m_tetrominoFactor.CreateRandomTetro()
+	var res = m_tetrominoFactor.CreateRandomTetro()
+	m_tetroThisTurn = res["blockAry"]
+	m_tetroDefineNow = res["tetroDefine"]
 	# 開始定時執行
 	m_timer.start()
 	# 放入對應位置的 playfield 方便取用
@@ -109,9 +112,75 @@ func moveTetroRight():
 			m_playfield[col][row + 1] = blockNode
 			m_playfield[col][row] = false
 
+# 計算方塊轉向後要在哪邊
+func getBlockRotatePos(blockPos:Dictionary, anchorPos:Dictionary)->Dictionary:
+	var newCol = 0
+	var newRow = 0
+	var _col = blockPos["col"] - anchorPos["col"]
+	var _row = blockPos["row"] - anchorPos["row"]
+	# 不用計算象限的
+	if _col == 0 or _row == 0:
+		if _row != 0 and _col == 0 :
+			newCol = _row * -1
+			newRow = 0
+		elif _row == 0 and _col != 0:
+			newCol = 0
+			newRow = _col
+		return {"col": newCol + anchorPos["col"], "row": newRow + anchorPos["row"]}
+	
+	# 對應象限更改
+	if _row > 0 and _col > 0:  # 第一象限
+		newRow = _col
+		newCol = _row * -1
+	elif _row > 0 and _col < 0:  # 第二象限
+		newRow = _col 
+		newCol = _row * -1
+	elif _row < 0 and _col < 0 :  # 第三象限
+		newRow = _col
+		newCol = _row * -1
+	elif _row < 0 and _col > 0:  # 第四象限
+		newRow = _col 
+		newCol = _row * -1
+		
+	return {"col": newCol + anchorPos["col"], "row": newRow + anchorPos["row"]}
+
 # 轉向
 func rotateTetro():
-	pass
+	# 轉的時候撞到牆QQ
+	var touchLeft = 0
+	var touchRight = 0
+	var touchTop = 0
+	# 如果開方塊不能轉
+	if not m_tetroDefineNow["rotate"]:
+		return
+	
+	var anchorNodePos = getTetroColRowWithNode(m_tetroDefineNow["anchorNode"])
+	var tempForPlaceNewBlock = []
+	# 記住新轉向後的位置 把現在位置的紀錄刪掉
+	for block in m_tetroThisTurn:
+		var blockPos = getTetroColRowWithNode(block)
+		if block == m_tetroDefineNow["anchorNode"]:
+			tempForPlaceNewBlock.append({"nextPos" : blockPos, "block": block})
+			m_playfield[blockPos["col"]][blockPos["row"]] = false
+			continue
+		var nextPos = getBlockRotatePos(blockPos, anchorNodePos)
+		tempForPlaceNewBlock.append({"nextPos" : nextPos, "block": block})
+		m_playfield[blockPos["col"]][blockPos["row"]] = false
+		
+		if nextPos["col"] >= BORDER_HEIGHT - 1:
+			touchTop = min(BORDER_HEIGHT - 1 - nextPos["col"], touchTop) 
+		if nextPos["row"] > BORDER_WIDTH - 1:
+			touchRight = -1
+		elif nextPos["row"] < 0:
+			touchLeft = 1
+	
+	# 寫入新位置方塊並重新Set position
+	for setting in tempForPlaceNewBlock:
+		var nextPos = setting["nextPos"]
+		m_playfield[nextPos["col"] + touchTop][nextPos["row"] + touchRight + touchLeft] = setting["block"]
+		setting["block"].position.x = (nextPos["row"] + touchRight + touchLeft + 0.5) * TetrominoDefine.BLOCK_WIDTH
+		setting["block"].position.y = (nextPos["col"] + touchTop + 0.5) * TetrominoDefine.BLOCK_HEIGHT * -1
+	
 
 func checkCanFall()->bool:
 	var findBottomBlock = false

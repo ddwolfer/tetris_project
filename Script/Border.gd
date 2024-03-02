@@ -205,6 +205,36 @@ func checkIsEndGame()->bool:
 			return true
 	return false
 
+# 確定有沒有要刪除的
+func checkLineEliminate():
+	for col in range(m_playfield.size()):
+		var haveEmpty = false
+		for block in m_playfield[col]:
+			if not block:
+				haveEmpty = true
+		if not haveEmpty:
+			eliminateLine(col)
+			checkLineEliminate()
+			return
+
+# 刪除一列		
+func eliminateLine(line:int):
+	# 整列的方塊消失
+	for row in range(m_playfield[line].size()):
+		var block = m_playfield[line][row]
+		self.remove_child(block)
+		m_playfield[line][row] = false
+	
+	# 把上面的方塊通通下移
+	for col in range(line, BORDER_HEIGHT):
+		for row in range(BORDER_WIDTH):
+			if not m_playfield[col][row]:
+				continue
+			var block = m_playfield[col][row]
+			block.position.y = block.position.y + TetrominoDefine.BLOCK_HEIGHT
+			m_playfield[col - 1][row] = m_playfield[col][row]
+			m_playfield[col][row] = false
+
 # 拿來落下用的
 func _on_timer_timeout():
 	if m_tetroThisTurn.size() <= 0:
@@ -212,6 +242,7 @@ func _on_timer_timeout():
 	if checkCanFall():
 		fallTetrominoThisTurn()
 	else:
+		checkLineEliminate()
 		m_timer.stop()
 		m_tetroThisTurn.clear()
 		if not checkIsEndGame():

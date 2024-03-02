@@ -8,10 +8,8 @@ size = Vector2(64, 64)
 [node name="Block" type="Area2D"]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-position = Vector2(32, -32)
 texture = ExtResource("1_sipdl")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(32, -32)
 shape = SubResource("RectangleShape2D_svvn2")
 debug_color = Color(0, 0.6, 0.701961, 0)

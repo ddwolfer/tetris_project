@@ -6,6 +6,9 @@
 
 [node name="Border" type="Node2D"]
 script = ExtResource("1_8x3sp")
+m_fallSpeed = 0.5
+
+[node name="Timer" type="Timer" parent="."]
 
 [node name="BorderBg" type="Node2D" parent="."]
 
@@ -32,3 +35,5 @@ patch_margin_left = 153
 patch_margin_top = 210
 patch_margin_right = 149
 patch_margin_bottom = 176
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

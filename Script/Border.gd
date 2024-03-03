@@ -151,7 +151,7 @@ func getBlockRotatePos(blockPos:Dictionary, anchorPos:Dictionary)->Dictionary:
 		
 	return {"row": newRow + anchorPos["row"], "col": newCol + anchorPos["col"]}
 
-# 轉向
+# 轉向  大致流程為  1.算出新位置 2.確認新位置會不會壞掉 3.砍掉原有位置紀錄點 4.將方塊轉移到新位置並記錄在m_playfield上面
 func rotateTetro():
 	# 轉的時候撞到牆QQ
 	var touchLeft = 0
@@ -166,29 +166,54 @@ func rotateTetro():
 	# 記住新轉向後的位置 把現在位置的紀錄刪掉
 	for block in m_tetroThisTurn:
 		var blockPos = getTetroRowColWithNode(block)
+		# 中心點方塊不轉
 		if block == m_tetroDefineNow["anchorNode"]:
 			tempForPlaceNewBlock.append({"nextPos" : blockPos, "block": block})
-			m_playfield[blockPos["row"]][blockPos["col"]] = false
 			continue
 		var nextPos = getBlockRotatePos(blockPos, anchorNodePos)
 		tempForPlaceNewBlock.append({"nextPos" : nextPos, "block": block})
-		m_playfield[blockPos["row"]][blockPos["col"]] = false
-		
+		# 避免撞牆
 		if nextPos["row"] >= BORDER_HEIGHT - 1:
 			touchTop = min(BORDER_HEIGHT - 1 - nextPos["row"], touchTop) 
 		if nextPos["col"] > BORDER_WIDTH - 1:
-			touchRight = -1
+			touchRight = min(BORDER_WIDTH - 1 - nextPos["col"], touchRight)
 		elif nextPos["col"] < 0:
-			touchLeft = 1
+			touchLeft = max(-nextPos["col"], touchLeft)
 	
+	# 微調位置
+	for blockInfo in tempForPlaceNewBlock:
+		blockInfo["nextPos"]["col"] = blockInfo["nextPos"]["col"] + touchRight + touchLeft
+		blockInfo["nextPos"]["row"] = blockInfo["nextPos"]["row"] + touchTop
+	
+	# 確認是否可轉
+	if not checkRotateValidity(tempForPlaceNewBlock):
+		return
+	
+	# 統一刪除
+	for block in m_tetroThisTurn:
+		var blockPos = getTetroRowColWithNode(block)
+		m_playfield[blockPos["row"]][blockPos["col"]] = false
+		
 	# 寫入新位置方塊並重新Set position
 	for setting in tempForPlaceNewBlock:
 		var nextPos = setting["nextPos"]
-		m_playfield[nextPos["row"] + touchTop][nextPos["col"] + touchRight + touchLeft] = setting["block"]
-		setting["block"].position.x = (nextPos["col"] + touchRight + touchLeft + 0.5) * TetrominoDefine.BLOCK_WIDTH
-		setting["block"].position.y = (nextPos["row"] + touchTop + 0.5) * TetrominoDefine.BLOCK_HEIGHT * -1
+		m_playfield[nextPos["row"]][nextPos["col"]] = setting["block"]
+		setting["block"].position.x = (nextPos["col"] + 0.5) * TetrominoDefine.BLOCK_WIDTH
+		setting["block"].position.y = (nextPos["row"] + 0.5) * TetrominoDefine.BLOCK_HEIGHT * -1
 	
+# 確認可轉不會壞
+func checkRotateValidity(newBlockList:Array)->bool:
+	for blockInfo in newBlockList:
+		var _col = blockInfo["nextPos"]["col"]
+		var _row = blockInfo["nextPos"]["row"]
+		# 如果該格有方塊
+		if m_playfield[_row][_col]:
+			# 如果該格方塊不是目前這輪的(也就是撞到現有方塊)
+			if not m_playfield[_row][_col] in m_tetroThisTurn:
+				return false
+	return true	
 
+# 可以再往下
 func checkCanFall()->bool:
 	for block in m_tetroThisTurn:
 		var pos = getTetroRowColWithNode(block)

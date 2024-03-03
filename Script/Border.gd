@@ -5,9 +5,11 @@ class_name border
 # const variables
 var BORDER_HEIGHT:int = 20
 var BORDER_WIDTH:int  = 10
+var MAX_FALL_SPEED:float  = 0.1
+var MIN_FALL_SPEED:float  = 2
 
 # variables
-@export var m_fallSpeed:float = 1
+var m_fallSpeed:float = MIN_FALL_SPEED
 var m_tetroDefineNow = null
 var m_playfield = []
 var m_tetroThisTurn = []
@@ -111,6 +113,11 @@ func moveTetroRight():
 			blockNode.position.x = blockNode.position.x + TetrominoDefine.BLOCK_WIDTH
 			m_playfield[row][col + 1] = blockNode
 			m_playfield[row][col] = false
+
+func setFallSpeed(speed): 
+	m_fallSpeed = speed
+	m_timer.wait_time = m_fallSpeed
+	m_timer.start()
 
 # 計算方塊轉向後要在哪邊
 func getBlockRotatePos(blockPos:Dictionary, anchorPos:Dictionary)->Dictionary:
@@ -261,4 +268,7 @@ func _input(_event):
 		moveTetroLeft()
 	if Input.is_action_just_pressed("up"):
 		rotateTetro()
-	pass
+	if Input.is_action_just_pressed("down"):
+		setFallSpeed(MAX_FALL_SPEED)
+	if Input.is_action_just_released("down"):
+		setFallSpeed(MIN_FALL_SPEED)
